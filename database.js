@@ -7,9 +7,9 @@ window.BasmatiDB = (() => {
     if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash ||
         /YOUR_PROJECT|invalid\.local/.test(url.host) || !c.SUPABASE_ANON_KEY ||
         c.SUPABASE_ANON_KEY.startsWith('YOUR_')) {
-      throw new Error('يلزم إعداد رابط Supabase والمفتاح العام في ملف config.js أولًا.');
+      throw new Error('الخدمة غير جاهزة حاليًا. يُرجى التواصل مع مسؤولة النموذج.');
     }
-    if (c.SUPABASE_ANON_KEY.startsWith('sb_secret_')) throw new Error('استخدمي المفتاح العام فقط في config.js.');
+    if (c.SUPABASE_ANON_KEY.startsWith('sb_secret_')) throw new Error('الخدمة غير جاهزة حاليًا. يُرجى التواصل مع مسؤولة النموذج.');
     return {url: url.origin, key: c.SUPABASE_ANON_KEY};
   }
   async function submit(record) {
@@ -26,16 +26,16 @@ window.BasmatiDB = (() => {
       const result = await response.json().catch(() => null);
       if (!response.ok) {
         console.error('Database submission failed', {status: response.status, code: result?.code});
-        if (response.status === 404) throw new Error('شغّلي ملف supabase/01_schema.sql في SQL Editor أولًا.');
-        if (response.status === 401 || response.status === 403) throw new Error('تعذّر الاتصال بالقاعدة. تحققي من المفتاح العام وتشغيل ملف SQL.');
+        if (response.status === 404) throw new Error('تعذّر إرسال التقييم حاليًا. احتُفظ بالمسودة؛ حاولي لاحقًا.');
+        if (response.status === 401 || response.status === 403) throw new Error('تعذّر إرسال التقييم حاليًا. احتُفظ بالمسودة؛ حاولي لاحقًا.');
         if (result?.code === '22023') throw new Error('تعذّر اعتماد البيانات. راجعي الحقول والشواهد وحاولي مجددًا.');
-        throw new Error('لم يتم تأكيد الحفظ في القاعدة. احتُفظ بالمسودة؛ أعيدي المحاولة.');
+        throw new Error('لم يكتمل إرسال التقييم. احتُفظ بالمسودة؛ أعيدي المحاولة.');
       }
-      if (!result || result.id !== record.id || !result.saved_at) throw new Error('لم يصل تأكيد صالح من القاعدة. أعيدي المحاولة.');
+      if (!result || result.id !== record.id || !result.saved_at) throw new Error('لم يكتمل إرسال التقييم. أعيدي المحاولة.');
       return result;
     } catch (error) {
       if (error.name === 'AbortError') throw new Error('انتهت مهلة الاتصال. احتُفظ بالمسودة؛ أعيدي المحاولة للتحقق من الحفظ.');
-      if (error instanceof TypeError) throw new Error('تعذّر الاتصال بالإنترنت أو Supabase. احتُفظ بالمسودة؛ أعيدي المحاولة.');
+      if (error instanceof TypeError) throw new Error('تعذّر الاتصال بالإنترنت. احتُفظ بالمسودة؛ أعيدي المحاولة.');
       throw error;
     } finally { clearTimeout(timer); }
   }
